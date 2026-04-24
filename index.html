@@ -3,153 +3,103 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CALC∞ — Advanced Calculator</title>
+    <title>CALC∞ — Pro Advanced Calculator</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        
         :root {
             --bg: #050810;
             --surface: rgba(8, 12, 30, 0.95);
             --border: rgba(0, 255, 200, 0.18);
             --accent: #00ffc8;
             --accent2: #7b61ff;
-            --accent3: #ff6b9d;
             --text: #e0fff8;
             --muted: rgba(224, 255, 248, 0.45);
         }
-
-        body {
-            background: var(--bg);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-family: 'Share Tech Mono', monospace;
-            color: var(--text);
-            overflow-x: hidden;
-        }
-
-        /* ব্যাকগ্রাউন্ড গ্রিড ও গ্লো */
-        body::before {
-            content: ''; position: fixed; inset: 0;
-            background: radial-gradient(circle at 50% 50%, rgba(0, 255, 200, 0.05) 0%, transparent 70%);
-            pointer-events: none;
-        }
-
-        .wrapper { width: 100%; max-width: 420px; padding: 15px; position: relative; z-index: 10; }
-
-        .header { text-align: center; margin-bottom: 20px; }
-        .header h1 {
-            font-family: 'Orbitron', sans-serif; font-weight: 900; font-size: 1.8rem;
-            letter-spacing: 0.3em; background: linear-gradient(135deg, #00ffc8, #7b61ff);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            filter: drop-shadow(0 0 8px rgba(0, 255, 200, 0.5));
-        }
-        .header p { font-size: 0.65rem; color: var(--muted); letter-spacing: 0.15em; text-transform: uppercase; margin-top: 5px; }
-
-        /* ক্যালকুলেটর মেইন কন্টেইনার */
-        .calc {
-            background: var(--surface); border: 1px solid var(--border);
-            border-radius: 24px; padding: 20px; backdrop-filter: blur(20px);
-            box-shadow: 0 40px 80px rgba(0, 0, 0, 0.8), inset 0 1px 1px rgba(255, 255, 255, 0.05);
-        }
-
-        /* ট্যাব ডিজাইন */
-        .tabs { display: flex; gap: 8px; margin-bottom: 15px; }
-        .tab {
-            flex: 1; padding: 10px 5px; background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(0, 255, 200, 0.1); border-radius: 10px;
-            color: var(--muted); font-size: 0.6rem; cursor: pointer; transition: 0.3s;
-            text-transform: uppercase; font-weight: bold;
-        }
-        .tab.active { background: rgba(0, 255, 200, 0.1); border-color: var(--accent); color: var(--accent); box-shadow: 0 0 15px rgba(0, 255, 200, 0.15); }
-
-        /* ডিসপ্লে */
-        .disp-box {
-            background: rgba(0, 4, 14, 0.9); border: 1px solid rgba(0, 255, 200, 0.2);
-            border-radius: 16px; padding: 15px; margin-bottom: 15px; position: relative;
-        }
-        .disp-label { font-size: 0.55rem; color: rgba(0, 255, 200, 0.4); position: absolute; top: 10px; left: 15px; }
-        .angle-tag { font-size: 0.55rem; color: var(--accent2); position: absolute; top: 10px; right: 15px; border: 1px solid rgba(123, 97, 255, 0.3); padding: 2px 6px; border-radius: 4px; }
+        body { background: var(--bg); min-height: 100vh; display: flex; align-items: center; justify-content: center; font-family: 'Share Tech Mono', monospace; color: var(--text); }
+        .wrapper { width: 100%; max-width: 420px; padding: 15px; z-index: 10; }
+        .header { text-align: center; margin-bottom: 15px; }
+        .header h1 { font-family: 'Orbitron', sans-serif; font-size: 1.8rem; letter-spacing: 0.2em; background: linear-gradient(135deg, #00ffc8, #7b61ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 0 5px rgba(0,255,200,0.3)); }
         
-        .expr { font-size: 0.8rem; color: var(--muted); text-align: right; min-height: 20px; margin-top: 15px; word-break: break-all; }
-        .screen {
-            font-family: 'Orbitron', sans-serif; font-size: 2.2rem; font-weight: 700;
-            color: var(--accent); text-align: right; text-shadow: 0 0 20px rgba(0, 255, 200, 0.6);
-            min-height: 50px; overflow-x: auto; white-space: nowrap; margin-top: 5px;
-        }
+        .calc { background: var(--surface); border: 1px solid var(--border); border-radius: 24px; padding: 18px; backdrop-filter: blur(20px); box-shadow: 0 30px 60px rgba(0,0,0,0.7); }
+        
+        .tabs { display: flex; gap: 8px; margin-bottom: 12px; }
+        .tab { flex: 1; padding: 10px; background: rgba(255,255,255,0.03); border: 1px solid rgba(0, 255, 200, 0.1); border-radius: 10px; color: var(--muted); font-size: 0.65rem; cursor: pointer; text-transform: uppercase; transition: 0.2s; }
+        .tab.active { background: rgba(0, 255, 200, 0.1); border-color: var(--accent); color: var(--accent); box-shadow: 0 0 10px rgba(0,255,200,0.2); }
 
-        /* মেমোরি বার */
-        .mem-bar { display: flex; gap: 6px; margin-bottom: 15px; }
-        .mbtn {
-            flex: 1; padding: 6px; background: rgba(123, 97, 255, 0.08);
-            border: 1px solid rgba(123, 97, 255, 0.2); border-radius: 8px;
-            color: #c8b4ff; font-size: 0.6rem; cursor: pointer;
-        }
+        .disp-box { background: rgba(0, 4, 14, 0.9); border: 1px solid rgba(0, 255, 200, 0.2); border-radius: 16px; padding: 15px; margin-bottom: 15px; position: relative; overflow: hidden; }
+        
+        .disp-label { font-family: 'Orbitron', sans-serif; font-size: 0.55rem; color: var(--accent); position: absolute; top: 12px; left: 15px; opacity: 0.8; letter-spacing: 1px; }
+        .angle-status { position: absolute; top: 10px; right: 12px; font-size: 0.55rem; color: var(--accent2); border: 1px solid var(--accent2); padding: 2px 6px; border-radius: 4px; cursor: pointer; background: rgba(123, 97, 255, 0.1); }
+        
+        .expr { font-size: 0.75rem; color: var(--muted); text-align: right; min-height: 20px; margin-top: 15px; letter-spacing: 1px; }
+        .screen { font-family: 'Orbitron', sans-serif; font-size: 2.2rem; color: var(--accent); text-align: right; text-shadow: 0 0 15px rgba(0, 255, 200, 0.5); min-height: 50px; overflow-x: auto; white-space: nowrap; }
 
-        /* গ্রিড সেটিংস */
-        .grid { display: grid; gap: 8px; }
-        .g4 { grid-template-columns: repeat(4, 1fr); }
-        .g5 { grid-template-columns: repeat(5, 1fr); }
+        .mem-bar { display: flex; gap: 5px; margin-bottom: 12px; }
+        .mbtn { flex: 1; padding: 7px; background: rgba(123, 97, 255, 0.1); border: 1px solid rgba(123, 97, 255, 0.2); border-radius: 6px; color: #c8b4ff; font-size: 0.55rem; cursor: pointer; transition: 0.2s; }
+        .mbtn:hover { background: rgba(123, 97, 255, 0.2); border-color: var(--accent2); }
 
-        /* বাটন ডিজাইন */
-        .btn {
-            height: 54px; border-radius: 12px; border: 1px solid transparent;
-            font-family: 'Share Tech Mono', monospace; font-size: 1rem; cursor: pointer;
-            display: flex; align-items: center; justify-content: center;
-            transition: 0.15s; user-select: none; color: var(--text);
-        }
-        .btn:active { transform: scale(0.92); }
-
-        .n { background: rgba(18, 26, 55, 0.9); border-color: rgba(255, 255, 255, 0.05); }
-        .op { background: rgba(0, 70, 70, 0.6); color: var(--accent); border-color: rgba(0, 255, 200, 0.2); }
-        .fn { background: rgba(55, 18, 85, 0.7); color: #c8b4ff; font-size: 0.75rem; }
-        .cl { background: rgba(170, 25, 55, 0.7); color: #ff9ab8; }
-        .bk { background: rgba(90, 35, 15, 0.7); color: #ffaa78; }
-        .eq { background: linear-gradient(135deg, #00ffc8, #009173); color: #001a12; font-weight: 900; font-size: 1.4rem; box-shadow: 0 0 20px rgba(0, 255, 200, 0.3); }
-
-        /* প্যানেল কন্ট্রোল */
-        .panel { display: none; }
-        .panel.active { display: grid; }
-
-        .foot { text-align: center; margin-top: 15px; font-size: 0.55rem; color: rgba(224, 255, 248, 0.15); letter-spacing: 0.2em; text-transform: uppercase; }
+        .grid { display: grid; gap: 8px; grid-template-columns: repeat(4, 1fr); }
+        .btn { height: 52px; border-radius: 12px; border: 1px solid transparent; font-family: inherit; font-size: 0.95rem; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--text); transition: 0.1s; }
+        .btn:active { transform: scale(0.92); filter: brightness(1.2); }
+        
+        .n { background: rgba(18, 26, 55, 0.9); border-color: rgba(255,255,255,0.05); }
+        .op { background: rgba(0, 70, 70, 0.5); color: var(--accent); border-color: rgba(0, 255, 200, 0.1); }
+        .fn { background: rgba(55, 18, 85, 0.6); color: #c8b4ff; font-size: 0.75rem; }
+        .cl { background: rgba(170, 25, 55, 0.6); color: #ff9ab8; }
+        .eq { background: linear-gradient(135deg, #00ffc8, #009173); color: #001a12; font-weight: bold; font-size: 1.2rem; box-shadow: 0 0 15px rgba(0, 255, 200, 0.2); }
+        
+        .extra-panel { display: grid; gap: 8px; grid-template-columns: repeat(5, 1fr); margin-bottom: 8px; transition: 0.3s; }
+        .hidden { display: none; }
     </style>
 </head>
 <body>
 
 <div class="wrapper">
-    <div class="header">
-        <h1>CALC∞</h1>
-        <p>Advanced Scientific Calculator</p>
-    </div>
+    <div class="header"><h1>CALC∞</h1><p>Advanced System</p></div>
 
     <div class="calc">
         <div class="tabs">
-            <button class="tab active" onclick="switchMode('std', this)">Standard</button>
-            <button class="tab" onclick="switchMode('sci', this)">Scientific</button>
-            <button class="tab" onclick="switchMode('prog', this)">Programmer</button>
+            <button class="tab active" onclick="setMode('std', this)">Standard</button>
+            <button class="tab" onclick="setMode('sci', this)">Scientific</button>
+            <button class="tab" onclick="setMode('prog', this)">Programmer</button>
         </div>
 
         <div class="disp-box">
             <span class="disp-label">CALC∞</span>
-            <span id="angleMode" class="angle-tag" style="display:none">DEG</span>
+            <div class="angle-status" id="angleBtn" onclick="toggleAngle()">DEG</div>
             <div class="expr" id="expr"></div>
             <div class="screen" id="screen">0</div>
         </div>
 
         <div class="mem-bar">
-            <button class="mbtn" onclick="memOp('MS')">MS</button>
-            <button class="mbtn" onclick="memOp('MR')">MR</button>
-            <button class="mbtn" onclick="memOp('M+')">M+</button>
-            <button class="mbtn" onclick="memOp('M-')">M-</button>
-            <button class="mbtn" onclick="memOp('MC')">MC</button>
+            <button class="mbtn" onclick="mem('MS')">MS</button>
+            <button class="mbtn" onclick="mem('MR')">MR</button>
+            <button class="mbtn" onclick="mem('M+')">M+</button>
+            <button class="mbtn" onclick="mem('M-')">M-</button>
+            <button class="mbtn" onclick="mem('MC')">MC</button>
         </div>
 
-        <div id="std-grid" class="grid g4 panel active">
+        <div id="sci-btns" class="extra-panel hidden">
+            <button class="btn fn" onclick="f('sin')">sin</button>
+            <button class="btn fn" onclick="f('cos')">cos</button>
+            <button class="btn fn" onclick="f('tan')">tan</button>
+            <button class="btn fn" onclick="f('log')">log</button>
+            <button class="btn fn" onclick="f('sqrt')">√</button>
+        </div>
+
+        <div id="prog-btns" class="extra-panel hidden">
+            <button class="btn fn" onclick="press('A')">A</button>
+            <button class="btn fn" onclick="press('B')">B</button>
+            <button class="btn fn" onclick="press('C')">C</button>
+            <button class="btn fn" onclick="press('D')">D</button>
+            <button class="btn fn" onclick="press('E')">E</button>
+        </div>
+
+        <div class="grid">
             <button class="btn cl" onclick="press('AC')">AC</button>
-            <button class="btn bk" onclick="press('BS')">⌫</button>
-            <button class="btn fn" onclick="press('+/-')">+/-</button>
+            <button class="btn op" onclick="press('BS')">⌫</button>
+            <button class="btn op" onclick="press('%')">%</button>
             <button class="btn op" onclick="press('/')">÷</button>
 
             <button class="btn n" onclick="press('7')">7</button>
@@ -167,118 +117,204 @@
             <button class="btn n" onclick="press('3')">3</button>
             <button class="btn op" onclick="press('+')">+</button>
 
-            <button class="btn fn" onclick="press('%')">%</button>
             <button class="btn n" onclick="press('0')">0</button>
             <button class="btn n" onclick="press('.')">.</button>
+            
+            <button class="btn fn" id="expBtn" onclick="f('exp')">exp</button>
+            
             <button class="btn eq" onclick="press('=')">=</button>
         </div>
-
-        <div id="sci-grid" class="grid g5 panel">
-            <button class="btn fn" onclick="sci('sin')">sin</button>
-            <button class="btn fn" onclick="sci('cos')">cos</button>
-            <button class="btn fn" onclick="sci('tan')">tan</button>
-            <button class="btn fn" onclick="sci('asin')">sin⁻¹</button>
-            <button class="btn fn" onclick="sci('acos')">cos⁻¹</button>
-            <button class="btn fn" onclick="sci('log')">log</button>
-            <button class="btn fn" onclick="sci('ln')">ln</button>
-            <button class="btn fn" onclick="sci('sqrt')">√</button>
-            <button class="btn fn" onclick="sci('pow')">xʸ</button>
-            <button class="btn fn" onclick="sci('abs')">|x|</button>
-            <button class="btn n" onclick="press('PI')">π</button>
-            <button class="btn n" onclick="press('E')">e</button>
-            <button class="btn fn" onclick="sci('fact')">n!</button>
-            <button class="btn op" onclick="press('(')">(</button>
-            <button class="btn op" onclick="press(')')">)</button>
-        </div>
-
-        <div id="prog-grid" class="grid g4 panel">
-            <button class="btn fn" onclick="base('BIN')">BIN</button>
-            <button class="btn fn" onclick="base('OCT')">OCT</button>
-            <button class="btn fn" onclick="base('HEX')">HEX</button>
-            <button class="btn fn" onclick="base('DEC')">DEC</button>
-            <button class="btn n" onclick="press('A')">A</button>
-            <button class="btn n" onclick="press('B')">B</button>
-            <button class="btn n" onclick="press('C')">C</button>
-            <button class="btn n" onclick="press('D')">D</button>
-            <button class="btn n" onclick="press('E')">E</button>
-            <button class="btn n" onclick="press('F')">F</button>
-            <button class="btn op" onclick="press('AND')">&</button>
-            <button class="btn op" onclick="press('OR')">|</button>
-        </div>
     </div>
-
-    <div class="foot">CALC∞ · POWERED BY JAVASCRIPT · OPEN SOURCE</div>
 </div>
 
 <script>
-    let display = document.getElementById('screen');
-    let exprDisplay = document.getElementById('expr');
-    let currentInput = '0';
-    let fullExpression = '';
-    let memory = 0;
+    let cur = "0", 
+        exp = "", 
+        memory = 0, 
+        mode = "DEG",
+        lastResult = null,
+        isNewInput = false;
 
-    function updateScreen() {
-        display.innerText = currentInput;
-        exprDisplay.innerText = fullExpression;
+    // New advanced calculator logic
+    function update() {
+        document.getElementById('screen').innerText = cur;
+        document.getElementById('expr').innerText = exp || "";
     }
 
-    function press(key) {
-        if (key === 'AC') {
-            currentInput = '0';
-            fullExpression = '';
-        } else if (key === 'BS') {
-            currentInput = currentInput.length > 1 ? currentInput.slice(0, -1) : '0';
-        } else if (key === '=') {
+    // Operator mapping and sanitization
+    function sanitizeExpression(str) {
+        return str
+            .replace(/×/g, '*')
+            .replace(/÷/g, '/')
+            .replace(/−/g, '-');
+    }
+
+    function isOperator(char) {
+        return ['+', '-', '*', '/', '%'].includes(char);
+    }
+
+    function press(k) {
+        const screen = document.getElementById('screen');
+        
+        if (k === 'AC') {
+            cur = "0";
+            exp = "";
+            isNewInput = false;
+        } 
+        else if (k === 'BS') {
+            if (isNewInput) return;
+            cur = cur.length > 1 ? cur.slice(0, -1) : "0";
+        } 
+        else if (k === '=') {
+            if (isNewInput) return;
             try {
-                let evalExpr = currentInput.replace('×', '*').replace('÷', '/').replace('π', Math.PI).replace('e', Math.E);
-                fullExpression = currentInput + ' =';
-                currentInput = eval(evalExpr).toString();
-            } catch {
-                currentInput = 'Error';
+                let expression = sanitizeExpression(cur);
+                exp = cur + " =";
+                
+                let res = Function('"use strict";return (' + expression + ')')();
+                
+                if (isNaN(res) || !isFinite(res)) throw "Error";
+                
+                lastResult = res;
+                cur = Number.isInteger(res) ? res.toString() : parseFloat(res.toFixed(8)).toString();
+                isNewInput = true;
+            } catch (e) {
+                cur = "Error";
+                exp = "";
+                isNewInput = true;
             }
-        } else if (key === '+/-') {
-            currentInput = (parseFloat(currentInput) * -1).toString();
-        } else {
-            if (currentInput === '0' && key !== '.') currentInput = key;
-            else currentInput += key;
+        } 
+        else if (k === '%') {
+            // Proper percent calculation like professional calculators
+            let num = parseFloat(cur);
+            if (!isNaN(num)) {
+                cur = (num / 100).toString();
+            }
+        } 
+        else {
+            if (isNewInput && !isOperator(k)) {
+                cur = (k === '.') ? "0." : k;
+                isNewInput = false;
+            } 
+            else if (cur === "0" && k !== '.' && !isOperator(k)) {
+                cur = k;
+            } 
+            else if (isOperator(k) && isOperator(cur.slice(-1))) {
+                // Prevent double operators
+                cur = cur.slice(0, -1) + k;
+            } 
+            else if (k === '.' && cur.includes('.')) {
+                // Prevent multiple decimal points
+                return;
+            } 
+            else {
+                cur += k;
+            }
         }
-        updateScreen();
+        update();
     }
 
-    function switchMode(mode, btn) {
+    function f(type) {
+        if (isNewInput && lastResult !== null) cur = lastResult.toString();
+        
+        let v = parseFloat(cur);
+        if (isNaN(v)) return;
+
+        let result;
+        let displayFunc = type.toUpperCase();
+
+        switch (type) {
+            case 'sin':
+                result = Math.sin(mode === 'DEG' ? v * Math.PI / 180 : v);
+                exp = displayFunc + "(" + cur + ")";
+                break;
+            case 'cos':
+                result = Math.cos(mode === 'DEG' ? v * Math.PI / 180 : v);
+                exp = displayFunc + "(" + cur + ")";
+                break;
+            case 'tan':
+                result = Math.tan(mode === 'DEG' ? v * Math.PI / 180 : v);
+                exp = displayFunc + "(" + cur + ")";
+                break;
+            case 'log':
+                result = Math.log10(v);
+                exp = "log₁₀(" + cur + ")";
+                break;
+            case 'sqrt':
+                result = Math.sqrt(v);
+                exp = "√(" + cur + ")";
+                break;
+            case 'exp':
+                // Advanced scientific notation support
+                if (!cur.includes('e') && !cur.includes('*10^')) {
+                    cur += "e";
+                    update();
+                    return;
+                }
+                return;
+        }
+
+        if (result !== undefined) {
+            cur = Number.isInteger(result) ? result.toString() : parseFloat(result.toFixed(8)).toString();
+            isNewInput = true;
+        }
+        update();
+    }
+
+    function setMode(m, el) {
         document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-        btn.classList.add('active');
+        el.classList.add('active');
         
-        document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-        document.getElementById(mode + '-grid').classList.add('active');
-        
-        document.getElementById('angleMode').style.display = (mode === 'sci') ? 'inline' : 'none';
+        document.getElementById('sci-btns').classList.toggle('hidden', m !== 'sci');
+        document.getElementById('prog-btns').classList.toggle('hidden', m !== 'prog');
     }
 
-    function sci(fn) {
-        let val = parseFloat(currentInput);
-        let res = 0;
-        switch(fn) {
-            case 'sin': res = Math.sin(val * Math.PI / 180); break;
-            case 'cos': res = Math.cos(val * Math.PI / 180); break;
-            case 'sqrt': res = Math.sqrt(val); break;
-            case 'log': res = Math.log10(val); break;
+    function toggleAngle() {
+        mode = mode === 'DEG' ? 'RAD' : 'DEG';
+        document.getElementById('angleBtn').innerText = mode;
+    }
+
+    function mem(op) {
+        let v = parseFloat(cur);
+        if (isNaN(v)) return;
+
+        if (op === 'MS') {
+            memory = v;
+            exp = "M Stored";
+        } else if (op === 'MR') {
+            cur = memory.toString();
+            isNewInput = true;
+        } else if (op === 'MC') {
+            memory = 0;
+            exp = "M Cleared";
+        } else if (op === 'M+') {
+            memory += v;
+            exp = "M+";
+        } else if (op === 'M-') {
+            memory -= v;
+            exp = "M-";
         }
-        currentInput = res.toString();
-        updateScreen();
+        update();
     }
 
-    function memOp(op) {
-        let val = parseFloat(currentInput);
-        if (op === 'MS') memory = val;
-        if (op === 'MR') currentInput = memory.toString();
-        if (op === 'MC') memory = 0;
-        if (op === 'M+') memory += val;
-        if (op === 'M-') memory -= val;
-        updateScreen();
-    }
+    // Keyboard support (pro feature)
+    document.addEventListener('keydown', function(e) {
+        if (document.activeElement.tagName === "INPUT") return;
+        
+        if (e.key >= '0' && e.key <= '9') press(e.key);
+        else if (e.key === '.') press('.');
+        else if (e.key === '+') press('+');
+        else if (e.key === '-') press('-');
+        else if (e.key === '*') press('*');
+        else if (e.key === '/') press('/');
+        else if (e.key === 'Enter' || e.key === '=') press('=');
+        else if (e.key === 'Backspace') press('BS');
+        else if (e.key === 'Escape') press('AC');
+        else if (e.key === '%') press('%');
+    });
+
+    // Initialize
+    update();
 </script>
-
 </body>
-              </html>
-              
+</html>
