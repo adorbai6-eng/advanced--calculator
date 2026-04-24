@@ -1,641 +1,284 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CALC∞ — Advanced Calculator</title>
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
-<style>
-  :root {
-    --bg: #050810;
-    --surface: rgba(10, 15, 35, 0.85);
-    --glass: rgba(255,255,255,0.04);
-    --border: rgba(0, 255, 200, 0.15);
-    --accent: #00ffc8;
-    --accent2: #7b61ff;
-    --accent3: #ff6b9d;
-    --text: #e0fff8;
-    --muted: rgba(224,255,248,0.4);
-    --btn-num: rgba(20, 30, 60, 0.9);
-    --btn-op: rgba(0, 80, 80, 0.6);
-    --btn-fn: rgba(60, 20, 90, 0.7);
-    --btn-eq: rgba(0, 180, 130, 0.8);
-    --btn-clear: rgba(180, 30, 60, 0.7);
-    --glow: 0 0 20px rgba(0, 255, 200, 0.3);
-    --glow2: 0 0 20px rgba(123, 97, 255, 0.4);
-    --shadow: 0 25px 60px rgba(0,0,0,0.7);
-  }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>CALC∞ — Advanced Calculator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
+        :root {
+            --bg: #050810;
+            --surface: rgba(8, 12, 30, 0.95);
+            --border: rgba(0, 255, 200, 0.18);
+            --accent: #00ffc8;
+            --accent2: #7b61ff;
+            --accent3: #ff6b9d;
+            --text: #e0fff8;
+            --muted: rgba(224, 255, 248, 0.45);
+        }
 
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: var(--bg);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Share Tech Mono', monospace;
+            color: var(--text);
+            overflow-x: hidden;
+        }
 
-  body {
-    background: var(--bg);
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: 'Share Tech Mono', monospace;
-    overflow: hidden;
-    position: relative;
-  }
+        /* ব্যাকগ্রাউন্ড গ্রিড ও গ্লো */
+        body::before {
+            content: ''; position: fixed; inset: 0;
+            background: radial-gradient(circle at 50% 50%, rgba(0, 255, 200, 0.05) 0%, transparent 70%);
+            pointer-events: none;
+        }
 
-  /* Animated background */
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background:
-      radial-gradient(ellipse 80% 50% at 20% 30%, rgba(0,255,200,0.06) 0%, transparent 60%),
-      radial-gradient(ellipse 60% 40% at 80% 70%, rgba(123,97,255,0.07) 0%, transparent 60%),
-      radial-gradient(ellipse 50% 60% at 50% 50%, rgba(255,107,157,0.04) 0%, transparent 70%);
-    animation: bgPulse 8s ease-in-out infinite alternate;
-    pointer-events: none;
-  }
+        .wrapper { width: 100%; max-width: 420px; padding: 15px; position: relative; z-index: 10; }
 
-  @keyframes bgPulse {
-    0% { opacity: 0.6; }
-    100% { opacity: 1; }
-  }
+        .header { text-align: center; margin-bottom: 20px; }
+        .header h1 {
+            font-family: 'Orbitron', sans-serif; font-weight: 900; font-size: 1.8rem;
+            letter-spacing: 0.3em; background: linear-gradient(135deg, #00ffc8, #7b61ff);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 8px rgba(0, 255, 200, 0.5));
+        }
+        .header p { font-size: 0.65rem; color: var(--muted); letter-spacing: 0.15em; text-transform: uppercase; margin-top: 5px; }
 
-  /* Grid dots */
-  body::after {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image: radial-gradient(circle, rgba(0,255,200,0.08) 1px, transparent 1px);
-    background-size: 40px 40px;
-    pointer-events: none;
-  }
+        /* ক্যালকুলেটর মেইন কন্টেইনার */
+        .calc {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 24px; padding: 20px; backdrop-filter: blur(20px);
+            box-shadow: 0 40px 80px rgba(0, 0, 0, 0.8), inset 0 1px 1px rgba(255, 255, 255, 0.05);
+        }
 
-  .wrapper {
-    position: relative;
-    z-index: 10;
-    width: 100%;
-    max-width: 420px;
-    padding: 16px;
-  }
+        /* ট্যাব ডিজাইন */
+        .tabs { display: flex; gap: 8px; margin-bottom: 15px; }
+        .tab {
+            flex: 1; padding: 10px 5px; background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(0, 255, 200, 0.1); border-radius: 10px;
+            color: var(--muted); font-size: 0.6rem; cursor: pointer; transition: 0.3s;
+            text-transform: uppercase; font-weight: bold;
+        }
+        .tab.active { background: rgba(0, 255, 200, 0.1); border-color: var(--accent); color: var(--accent); box-shadow: 0 0 15px rgba(0, 255, 200, 0.15); }
 
-  /* Header */
-  .header {
-    text-align: center;
-    margin-bottom: 16px;
-  }
+        /* ডিসপ্লে */
+        .disp-box {
+            background: rgba(0, 4, 14, 0.9); border: 1px solid rgba(0, 255, 200, 0.2);
+            border-radius: 16px; padding: 15px; margin-bottom: 15px; position: relative;
+        }
+        .disp-label { font-size: 0.55rem; color: rgba(0, 255, 200, 0.4); position: absolute; top: 10px; left: 15px; }
+        .angle-tag { font-size: 0.55rem; color: var(--accent2); position: absolute; top: 10px; right: 15px; border: 1px solid rgba(123, 97, 255, 0.3); padding: 2px 6px; border-radius: 4px; }
+        
+        .expr { font-size: 0.8rem; color: var(--muted); text-align: right; min-height: 20px; margin-top: 15px; word-break: break-all; }
+        .screen {
+            font-family: 'Orbitron', sans-serif; font-size: 2.2rem; font-weight: 700;
+            color: var(--accent); text-align: right; text-shadow: 0 0 20px rgba(0, 255, 200, 0.6);
+            min-height: 50px; overflow-x: auto; white-space: nowrap; margin-top: 5px;
+        }
 
-  .header h1 {
-    font-family: 'Orbitron', sans-serif;
-    font-weight: 900;
-    font-size: 1.8rem;
-    letter-spacing: 0.3em;
-    background: linear-gradient(135deg, var(--accent), var(--accent2), var(--accent3));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    text-shadow: none;
-    filter: drop-shadow(0 0 12px rgba(0,255,200,0.5));
-  }
+        /* মেমোরি বার */
+        .mem-bar { display: flex; gap: 6px; margin-bottom: 15px; }
+        .mbtn {
+            flex: 1; padding: 6px; background: rgba(123, 97, 255, 0.08);
+            border: 1px solid rgba(123, 97, 255, 0.2); border-radius: 8px;
+            color: #c8b4ff; font-size: 0.6rem; cursor: pointer;
+        }
 
-  .header p {
-    font-size: 0.65rem;
-    color: var(--muted);
-    letter-spacing: 0.2em;
-    margin-top: 2px;
-    text-transform: uppercase;
-  }
+        /* গ্রিড সেটিংস */
+        .grid { display: grid; gap: 8px; }
+        .g4 { grid-template-columns: repeat(4, 1fr); }
+        .g5 { grid-template-columns: repeat(5, 1fr); }
 
-  /* Calculator shell */
-  .calc {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 24px;
-    padding: 20px;
-    backdrop-filter: blur(30px);
-    box-shadow: var(--shadow), 0 0 0 1px rgba(0,255,200,0.05), inset 0 1px 0 rgba(255,255,255,0.05);
-    position: relative;
-    overflow: hidden;
-  }
+        /* বাটন ডিজাইন */
+        .btn {
+            height: 54px; border-radius: 12px; border: 1px solid transparent;
+            font-family: 'Share Tech Mono', monospace; font-size: 1rem; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: 0.15s; user-select: none; color: var(--text);
+        }
+        .btn:active { transform: scale(0.92); }
 
-  .calc::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, var(--accent), var(--accent2), transparent);
-    opacity: 0.6;
-  }
+        .n { background: rgba(18, 26, 55, 0.9); border-color: rgba(255, 255, 255, 0.05); }
+        .op { background: rgba(0, 70, 70, 0.6); color: var(--accent); border-color: rgba(0, 255, 200, 0.2); }
+        .fn { background: rgba(55, 18, 85, 0.7); color: #c8b4ff; font-size: 0.75rem; }
+        .cl { background: rgba(170, 25, 55, 0.7); color: #ff9ab8; }
+        .bk { background: rgba(90, 35, 15, 0.7); color: #ffaa78; }
+        .eq { background: linear-gradient(135deg, #00ffc8, #009173); color: #001a12; font-weight: 900; font-size: 1.4rem; box-shadow: 0 0 20px rgba(0, 255, 200, 0.3); }
 
-  /* Mode tabs */
-  .mode-tabs {
-    display: flex;
-    gap: 6px;
-    margin-bottom: 14px;
-  }
+        /* প্যানেল কন্ট্রোল */
+        .panel { display: none; }
+        .panel.active { display: grid; }
 
-  .mode-tab {
-    flex: 1;
-    padding: 6px 4px;
-    background: var(--glass);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    color: var(--muted);
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.62rem;
-    letter-spacing: 0.05em;
-    cursor: pointer;
-    transition: all 0.2s;
-    text-transform: uppercase;
-  }
-
-  .mode-tab.active {
-    background: rgba(0,255,200,0.12);
-    border-color: var(--accent);
-    color: var(--accent);
-    box-shadow: 0 0 12px rgba(0,255,200,0.2);
-  }
-
-  .mode-tab:hover:not(.active) {
-    background: rgba(255,255,255,0.06);
-    color: var(--text);
-  }
-
-  /* Display */
-  .display-wrap {
-    background: rgba(0,5,15,0.8);
-    border: 1px solid rgba(0,255,200,0.2);
-    border-radius: 14px;
-    padding: 14px 16px;
-    margin-bottom: 14px;
-    min-height: 90px;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .display-wrap::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg, rgba(0,255,200,0.03) 0%, transparent 60%);
-  }
-
-  .expression {
-    font-size: 0.72rem;
-    color: var(--muted);
-    min-height: 18px;
-    text-align: right;
-    letter-spacing: 0.05em;
-    margin-bottom: 6px;
-    word-break: break-all;
-  }
-
-  .display {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 2rem;
-    font-weight: 700;
-    color: var(--accent);
-    text-align: right;
-    letter-spacing: 0.05em;
-    text-shadow: 0 0 20px rgba(0,255,200,0.5);
-    word-break: break-all;
-    line-height: 1.1;
-    transition: all 0.1s;
-  }
-
-  .display.small { font-size: 1.3rem; }
-  .display.tiny { font-size: 1rem; }
-
-  .display.error {
-    color: var(--accent3);
-    text-shadow: 0 0 20px rgba(255,107,157,0.5);
-  }
-
-  .display-hint {
-    font-size: 0.55rem;
-    color: rgba(0,255,200,0.3);
-    position: absolute;
-    top: 8px;
-    left: 12px;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-  }
-
-  /* Memory bar */
-  .memory-bar {
-    display: flex;
-    gap: 5px;
-    margin-bottom: 12px;
-    align-items: center;
-  }
-
-  .mem-label {
-    font-size: 0.55rem;
-    color: var(--muted);
-    letter-spacing: 0.1em;
-    margin-right: 2px;
-  }
-
-  .mem-btn {
-    flex: 1;
-    padding: 5px 2px;
-    background: rgba(123,97,255,0.1);
-    border: 1px solid rgba(123,97,255,0.2);
-    border-radius: 6px;
-    color: rgba(200,180,255,0.7);
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.58rem;
-    cursor: pointer;
-    transition: all 0.15s;
-    letter-spacing: 0.03em;
-  }
-
-  .mem-btn:hover {
-    background: rgba(123,97,255,0.25);
-    color: #c8b4ff;
-    box-shadow: 0 0 8px rgba(123,97,255,0.3);
-  }
-
-  .mem-btn:active { transform: scale(0.95); }
-
-  /* Button grid */
-  .btn-grid {
-    display: grid;
-    gap: 8px;
-  }
-
-  .btn-grid.standard { grid-template-columns: repeat(4, 1fr); }
-  .btn-grid.scientific { grid-template-columns: repeat(5, 1fr); }
-
-  /* Buttons */
-  .btn {
-    position: relative;
-    padding: 0;
-    height: 54px;
-    border-radius: 12px;
-    border: 1px solid transparent;
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.9rem;
-    cursor: pointer;
-    transition: all 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
-    overflow: hidden;
-    letter-spacing: 0.02em;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    -webkit-tap-highlight-color: transparent;
-    user-select: none;
-  }
-
-  .btn::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    opacity: 0;
-    transition: opacity 0.15s;
-    border-radius: 12px;
-  }
-
-  .btn:active::before { opacity: 1; }
-  .btn:active { transform: scale(0.93); }
-
-  /* Num buttons */
-  .btn-num {
-    background: var(--btn-num);
-    border-color: rgba(255,255,255,0.07);
-    color: var(--text);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.06);
-  }
-  .btn-num::before { background: rgba(255,255,255,0.08); }
-  .btn-num:hover { border-color: rgba(0,255,200,0.2); box-shadow: 0 4px 20px rgba(0,255,200,0.1), inset 0 1px 0 rgba(255,255,255,0.06); }
-
-  /* Op buttons */
-  .btn-op {
-    background: var(--btn-op);
-    border-color: rgba(0,255,200,0.2);
-    color: var(--accent);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.4), 0 0 10px rgba(0,255,200,0.1);
-  }
-  .btn-op::before { background: rgba(0,255,200,0.1); }
-  .btn-op:hover { box-shadow: 0 4px 20px rgba(0,255,200,0.25), 0 0 15px rgba(0,255,200,0.15); }
-
-  /* Fn buttons */
-  .btn-fn {
-    background: var(--btn-fn);
-    border-color: rgba(123,97,255,0.25);
-    color: #c8b4ff;
-    font-size: 0.72rem;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.4), 0 0 10px rgba(123,97,255,0.1);
-  }
-  .btn-fn::before { background: rgba(123,97,255,0.1); }
-  .btn-fn:hover { box-shadow: 0 4px 20px rgba(123,97,255,0.3); border-color: rgba(123,97,255,0.4); }
-
-  /* Equals */
-  .btn-eq {
-    background: linear-gradient(135deg, rgba(0,200,160,0.8), rgba(0,150,120,0.8));
-    border-color: rgba(0,255,200,0.3);
-    color: #000d0a;
-    font-weight: 700;
-    font-size: 1.2rem;
-    box-shadow: 0 4px 20px rgba(0,255,200,0.3), 0 0 20px rgba(0,255,200,0.15);
-  }
-  .btn-eq:hover { box-shadow: 0 4px 30px rgba(0,255,200,0.5), 0 0 30px rgba(0,255,200,0.25); }
-  .btn-eq::before { background: rgba(255,255,255,0.15); }
-
-  /* Clear */
-  .btn-clear {
-    background: var(--btn-clear);
-    border-color: rgba(255,107,157,0.25);
-    color: #ff9ab8;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.4), 0 0 10px rgba(255,107,157,0.1);
-  }
-  .btn-clear::before { background: rgba(255,107,157,0.1); }
-  .btn-clear:hover { box-shadow: 0 4px 20px rgba(255,107,157,0.3); }
-
-  /* Backspace */
-  .btn-back {
-    background: rgba(100,40,20,0.7);
-    border-color: rgba(255,150,100,0.2);
-    color: #ffaa80;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
-  }
-  .btn-back:hover { box-shadow: 0 4px 20px rgba(255,150,100,0.2); }
-
-  /* Span 2 cols */
-  .span2 { grid-column: span 2; }
-
-  /* Ripple effect */
-  .ripple {
-    position: absolute;
-    border-radius: 50%;
-    background: rgba(255,255,255,0.15);
-    transform: scale(0);
-    animation: rippleAnim 0.4s ease-out;
-    pointer-events: none;
-  }
-  @keyframes rippleAnim {
-    to { transform: scale(4); opacity: 0; }
-  }
-
-  /* Scientific panel */
-  .sci-panel { display: none; }
-  .sci-panel.active { display: contents; }
-
-  /* Angle mode indicator */
-  .angle-indicator {
-    position: absolute;
-    bottom: 8px;
-    left: 12px;
-    font-size: 0.55rem;
-    color: var(--accent2);
-    letter-spacing: 0.1em;
-    cursor: pointer;
-    padding: 2px 6px;
-    border: 1px solid rgba(123,97,255,0.3);
-    border-radius: 4px;
-    background: rgba(123,97,255,0.1);
-    transition: all 0.2s;
-  }
-  .angle-indicator:hover { background: rgba(123,97,255,0.2); }
-
-  /* Animate display on result */
-  @keyframes resultPop {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.03); }
-    100% { transform: scale(1); }
-  }
-  .result-anim { animation: resultPop 0.3s ease; }
-
-  /* Pulse on error */
-  @keyframes errShake {
-    0%,100% { transform: translateX(0); }
-    25% { transform: translateX(-6px); }
-    75% { transform: translateX(6px); }
-  }
-  .err-anim { animation: errShake 0.3s ease; }
-
-  /* Footer */
-  .footer {
-    text-align: center;
-    margin-top: 14px;
-    font-size: 0.55rem;
-    color: rgba(224,255,248,0.15);
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-  }
-
-  /* Scrollbar */
-  ::-webkit-scrollbar { width: 4px; }
-  ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
-
-  @media (max-width: 440px) {
-    .wrapper { padding: 10px; }
-    .calc { padding: 14px; }
-    .btn { height: 48px; font-size: 0.82rem; }
-    .btn-fn { font-size: 0.65rem; }
-    .display { font-size: 1.7rem; }
-    .header h1 { font-size: 1.4rem; }
-  }
-</style>
+        .foot { text-align: center; margin-top: 15px; font-size: 0.55rem; color: rgba(224, 255, 248, 0.15); letter-spacing: 0.2em; text-transform: uppercase; }
+    </style>
 </head>
 <body>
 
 <div class="wrapper">
-  <div class="header">
-    <h1>CALC∞</h1>
-    <p>Advanced Scientific Calculator</p>
-  </div>
-
-  <div class="calc">
-    <!-- Mode Tabs -->
-    <div class="mode-tabs">
-      <button class="mode-tab active" onclick="setMode('standard')">Standard</button>
-      <button class="mode-tab" onclick="setMode('scientific')">Scientific</button>
-      <button class="mode-tab" onclick="setMode('programmer')">Programmer</button>
+    <div class="header">
+        <h1>CALC∞</h1>
+        <p>Advanced Scientific Calculator</p>
     </div>
 
-    <!-- Display -->
-    <div class="display-wrap">
-      <span class="display-hint">CALC∞</span>
-      <div class="expression" id="expression"></div>
-      <div class="display" id="display">0</div>
-      <div class="angle-indicator" id="angleBtn" onclick="toggleAngle()">RAD</div>
+    <div class="calc">
+        <div class="tabs">
+            <button class="tab active" onclick="switchMode('std', this)">Standard</button>
+            <button class="tab" onclick="switchMode('sci', this)">Scientific</button>
+            <button class="tab" onclick="switchMode('prog', this)">Programmer</button>
+        </div>
+
+        <div class="disp-box">
+            <span class="disp-label">CALC∞</span>
+            <span id="angleMode" class="angle-tag" style="display:none">DEG</span>
+            <div class="expr" id="expr"></div>
+            <div class="screen" id="screen">0</div>
+        </div>
+
+        <div class="mem-bar">
+            <button class="mbtn" onclick="memOp('MS')">MS</button>
+            <button class="mbtn" onclick="memOp('MR')">MR</button>
+            <button class="mbtn" onclick="memOp('M+')">M+</button>
+            <button class="mbtn" onclick="memOp('M-')">M-</button>
+            <button class="mbtn" onclick="memOp('MC')">MC</button>
+        </div>
+
+        <div id="std-grid" class="grid g4 panel active">
+            <button class="btn cl" onclick="press('AC')">AC</button>
+            <button class="btn bk" onclick="press('BS')">⌫</button>
+            <button class="btn fn" onclick="press('+/-')">+/-</button>
+            <button class="btn op" onclick="press('/')">÷</button>
+
+            <button class="btn n" onclick="press('7')">7</button>
+            <button class="btn n" onclick="press('8')">8</button>
+            <button class="btn n" onclick="press('9')">9</button>
+            <button class="btn op" onclick="press('*')">×</button>
+
+            <button class="btn n" onclick="press('4')">4</button>
+            <button class="btn n" onclick="press('5')">5</button>
+            <button class="btn n" onclick="press('6')">6</button>
+            <button class="btn op" onclick="press('-')">−</button>
+
+            <button class="btn n" onclick="press('1')">1</button>
+            <button class="btn n" onclick="press('2')">2</button>
+            <button class="btn n" onclick="press('3')">3</button>
+            <button class="btn op" onclick="press('+')">+</button>
+
+            <button class="btn fn" onclick="press('%')">%</button>
+            <button class="btn n" onclick="press('0')">0</button>
+            <button class="btn n" onclick="press('.')">.</button>
+            <button class="btn eq" onclick="press('=')">=</button>
+        </div>
+
+        <div id="sci-grid" class="grid g5 panel">
+            <button class="btn fn" onclick="sci('sin')">sin</button>
+            <button class="btn fn" onclick="sci('cos')">cos</button>
+            <button class="btn fn" onclick="sci('tan')">tan</button>
+            <button class="btn fn" onclick="sci('asin')">sin⁻¹</button>
+            <button class="btn fn" onclick="sci('acos')">cos⁻¹</button>
+            <button class="btn fn" onclick="sci('log')">log</button>
+            <button class="btn fn" onclick="sci('ln')">ln</button>
+            <button class="btn fn" onclick="sci('sqrt')">√</button>
+            <button class="btn fn" onclick="sci('pow')">xʸ</button>
+            <button class="btn fn" onclick="sci('abs')">|x|</button>
+            <button class="btn n" onclick="press('PI')">π</button>
+            <button class="btn n" onclick="press('E')">e</button>
+            <button class="btn fn" onclick="sci('fact')">n!</button>
+            <button class="btn op" onclick="press('(')">(</button>
+            <button class="btn op" onclick="press(')')">)</button>
+        </div>
+
+        <div id="prog-grid" class="grid g4 panel">
+            <button class="btn fn" onclick="base('BIN')">BIN</button>
+            <button class="btn fn" onclick="base('OCT')">OCT</button>
+            <button class="btn fn" onclick="base('HEX')">HEX</button>
+            <button class="btn fn" onclick="base('DEC')">DEC</button>
+            <button class="btn n" onclick="press('A')">A</button>
+            <button class="btn n" onclick="press('B')">B</button>
+            <button class="btn n" onclick="press('C')">C</button>
+            <button class="btn n" onclick="press('D')">D</button>
+            <button class="btn n" onclick="press('E')">E</button>
+            <button class="btn n" onclick="press('F')">F</button>
+            <button class="btn op" onclick="press('AND')">&</button>
+            <button class="btn op" onclick="press('OR')">|</button>
+        </div>
     </div>
 
-    <!-- Memory Bar -->
-    <div class="memory-bar">
-      <span class="mem-label">MEM</span>
-      <button class="mem-btn" onclick="memStore()">MS</button>
-      <button class="mem-btn" onclick="memRecall()">MR</button>
-      <button class="mem-btn" onclick="memAdd()">M+</button>
-      <button class="mem-btn" onclick="memSub()">M-</button>
-      <button class="mem-btn" onclick="memClear()">MC</button>
-    </div>
-
-    <!-- Standard Buttons -->
-    <div class="btn-grid standard" id="standardGrid">
-      <!-- Row 1 -->
-      <button class="btn btn-clear" onclick="clearAll()">AC</button>
-      <button class="btn btn-back" onclick="backspace()">⌫</button>
-      <button class="btn btn-fn" onclick="toggleSign()">+/−</button>
-      <button class="btn btn-op" onclick="appendOp('/')">÷</button>
-
-      <!-- Row 2 -->
-      <button class="btn btn-num" onclick="appendNum('7')">7</button>
-      <button class="btn btn-num" onclick="appendNum('8')">8</button>
-      <button class="btn btn-num" onclick="appendNum('9')">9</button>
-      <button class="btn btn-op" onclick="appendOp('*')">×</button>
-
-      <!-- Row 3 -->
-      <button class="btn btn-num" onclick="appendNum('4')">4</button>
-      <button class="btn btn-num" onclick="appendNum('5')">5</button>
-      <button class="btn btn-num" onclick="appendNum('6')">6</button>
-      <button class="btn btn-op" onclick="appendOp('-')">−</button>
-
-      <!-- Row 4 -->
-      <button class="btn btn-num" onclick="appendNum('1')">1</button>
-      <button class="btn btn-num" onclick="appendNum('2')">2</button>
-      <button class="btn btn-num" onclick="appendNum('3')">3</button>
-      <button class="btn btn-op" onclick="appendOp('+')">+</button>
-
-      <!-- Row 5 -->
-      <button class="btn btn-num" onclick="appendOp('%')">%</button>
-      <button class="btn btn-num" onclick="appendNum('0')">0</button>
-      <button class="btn btn-num" onclick="appendDot()">.</button>
-      <button class="btn btn-eq" onclick="calculate()">=</button>
-    </div>
-
-    <!-- Scientific Buttons -->
-    <div class="btn-grid scientific" id="scientificGrid" style="display:none; margin-top:8px;">
-      <button class="btn btn-fn" onclick="appendFunc('sin(')">sin</button>
-      <button class="btn btn-fn" onclick="appendFunc('cos(')">cos</button>
-      <button class="btn btn-fn" onclick="appendFunc('tan(')">tan</button>
-      <button class="btn btn-fn" onclick="appendFunc('asin(')">sin⁻¹</button>
-      <button class="btn btn-fn" onclick="appendFunc('acos(')">cos⁻¹</button>
-
-      <button class="btn btn-fn" onclick="appendFunc('atan(')">tan⁻¹</button>
-      <button class="btn btn-fn" onclick="appendFunc('log(')">log</button>
-      <button class="btn btn-fn" onclick="appendFunc('ln(')">ln</button>
-      <button class="btn btn-fn" onclick="appendFunc('sqrt(')">√</button>
-      <button class="btn btn-fn" onclick="appendFunc('cbrt(')">∛</button>
-
-      <button class="btn btn-fn" onclick="appendFunc('pow2(')">x²</button>
-      <button class="btn btn-fn" onclick="appendFunc('pow3(')">x³</button>
-      <button class="btn btn-fn" onclick="appendOp('^')">xʸ</button>
-      <button class="btn btn-fn" onclick="appendFunc('exp(')">eˣ</button>
-      <button class="btn btn-fn" onclick="appendFunc('abs(')">|x|</button>
-
-      <button class="btn btn-fn" onclick="appendConst('Math.PI')">π</button>
-      <button class="btn btn-fn" onclick="appendConst('Math.E')">e</button>
-      <button class="btn btn-fn" onclick="appendFunc('fact(')">n!</button>
-      <button class="btn btn-fn" onclick="appendStr('(')">( </button>
-      <button class="btn btn-fn" onclick="appendStr(')')"> )</button>
-    </div>
-
-    <!-- Programmer Buttons -->
-    <div class="btn-grid scientific" id="programmerGrid" style="display:none; margin-top:8px;">
-      <button class="btn btn-fn" onclick="convertBase('bin')" id="binBtn">BIN</button>
-      <button class="btn btn-fn" onclick="convertBase('oct')" id="octBtn">OCT</button>
-      <button class="btn btn-fn" onclick="convertBase('dec')" id="decBtn">DEC</button>
-      <button class="btn btn-fn" onclick="convertBase('hex')" id="hexBtn">HEX</button>
-      <button class="btn btn-fn" onclick="appendOp('&')">AND</button>
-
-      <button class="btn btn-fn" onclick="appendOp('|')">OR</button>
-      <button class="btn btn-fn" onclick="appendOp('XOR')">XOR</button>
-      <button class="btn btn-fn" onclick="appendFunc('NOT(')">NOT</button>
-      <button class="btn btn-fn" onclick="appendOp('<<')">LSH</button>
-      <button class="btn btn-fn" onclick="appendOp('>>')">RSH</button>
-
-      <button class="btn btn-num" onclick="appendHex('A')">A</button>
-      <button class="btn btn-num" onclick="appendHex('B')">B</button>
-      <button class="btn btn-num" onclick="appendHex('C')">C</button>
-      <button class="btn btn-num" onclick="appendHex('D')">D</button>
-      <button class="btn btn-num" onclick="appendHex('E')">E</button>
-
-      <button class="btn btn-num span2" onclick="appendHex('F')">F</button>
-      <button class="btn btn-fn span2" onclick="showBaseInfo()">BASE INFO</button>
-      <button class="btn btn-op" onclick="appendOp('%')">MOD</button>
-    </div>
-  </div>
-
-  <div class="footer">CALC∞ · Powered by JavaScript · Open Source</div>
+    <div class="foot">CALC∞ · POWERED BY JAVASCRIPT · OPEN SOURCE</div>
 </div>
 
 <script>
-// ─── State ───────────────────────────────────────────
-let currentInput = '0';
-let expression = '';
-let memory = 0;
-let angleMode = 'RAD'; // RAD or DEG
-let currentMode = 'standard';
-let lastResult = null;
-let justCalculated = false;
+    let display = document.getElementById('screen');
+    let exprDisplay = document.getElementById('expr');
+    let currentInput = '0';
+    let fullExpression = '';
+    let memory = 0;
 
-// ─── Display ─────────────────────────────────────────
-function updateDisplay(val, expr) {
-  const d = document.getElementById('display');
-  const e = document.getElementById('expression');
+    function updateScreen() {
+        display.innerText = currentInput;
+        exprDisplay.innerText = fullExpression;
+    }
 
-  const str = String(val);
-  d.classList.remove('small','tiny','error');
-  if (str.length > 12) d.classList.add('tiny');
-  else if (str.length > 9) d.classList.add('small');
+    function press(key) {
+        if (key === 'AC') {
+            currentInput = '0';
+            fullExpression = '';
+        } else if (key === 'BS') {
+            currentInput = currentInput.length > 1 ? currentInput.slice(0, -1) : '0';
+        } else if (key === '=') {
+            try {
+                let evalExpr = currentInput.replace('×', '*').replace('÷', '/').replace('π', Math.PI).replace('e', Math.E);
+                fullExpression = currentInput + ' =';
+                currentInput = eval(evalExpr).toString();
+            } catch {
+                currentInput = 'Error';
+            }
+        } else if (key === '+/-') {
+            currentInput = (parseFloat(currentInput) * -1).toString();
+        } else {
+            if (currentInput === '0' && key !== '.') currentInput = key;
+            else currentInput += key;
+        }
+        updateScreen();
+    }
 
-  d.textContent = str;
-  if (expr !== undefined) e.textContent = expr;
-}
+    function switchMode(mode, btn) {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        btn.classList.add('active');
+        
+        document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+        document.getElementById(mode + '-grid').classList.add('active');
+        
+        document.getElementById('angleMode').style.display = (mode === 'sci') ? 'inline' : 'none';
+    }
 
-function flashResult() {
-  const d = document.getElementById('display');
-  d.classList.add('result-anim');
-  setTimeout(() => d.classList.remove('result-anim'), 300);
-}
+    function sci(fn) {
+        let val = parseFloat(currentInput);
+        let res = 0;
+        switch(fn) {
+            case 'sin': res = Math.sin(val * Math.PI / 180); break;
+            case 'cos': res = Math.cos(val * Math.PI / 180); break;
+            case 'sqrt': res = Math.sqrt(val); break;
+            case 'log': res = Math.log10(val); break;
+        }
+        currentInput = res.toString();
+        updateScreen();
+    }
 
-function showError(msg) {
-  const d = document.getElementById('display');
-  currentInput = '0';
-  expression = '';
-  d.textContent = msg || 'ERROR';
-  d.classList.add('error','err-anim');
-  document.getElementById('expression').textContent = '';
-  setTimeout(() => { d.classList.remove('err-anim'); updateDisplay('0', ''); }, 1500);
-}
+    function memOp(op) {
+        let val = parseFloat(currentInput);
+        if (op === 'MS') memory = val;
+        if (op === 'MR') currentInput = memory.toString();
+        if (op === 'MC') memory = 0;
+        if (op === 'M+') memory += val;
+        if (op === 'M-') memory -= val;
+        updateScreen();
+    }
+</script>
 
-// ─── Ripple ───────────────────────────────────────────
-document.querySelectorAll('.btn').forEach(btn => {
-  btn.addEventListener('click', function(e) {
-    const r = document.createElement('span');
-    r.className = 'ripple';
-    const rect = this.getBoundingClientRect();
-    const size = Math.max(rect.width, rect.height);
-    r.style.width = r.style.height = size + 'px';
-    r.style.left = (e.clientX - rect.left - size/2) + 'px';
-    r.style.top = (e.clientY - rect.top - size/2) + 'px';
-    this.appendChild(r);
-    setTimeout(() => r.remove(), 400);
-  });
-});
-
-// ─── Mode ─────────────────────────────────────────────
-function setMode(mode) {
-  currentMode = mode;
-  document.querySelectorAll('.mode-tab').forEach((t, i) => {
-    t.classList.toggle('active', ['standard','scientific','programmer'][i] === mode);
-  });
-  document.getElementById('scientificGrid').style.display = (mode === 'scientific') ? 'grid' : 'none';
-  document.getElementById('programmerGrid').style.display = (mode === 'programmer') ? 'grid' : 'none';
-  document.getElementById('angleBtn').style.display = (mode === 'scientific') ? 'block' : 'none';
-  clearAll();
-}
-
-// ─── Input ────────────────────────────────────────────
-function appendNum(n) {
-  if (justCalculated) { currentInput = n; expression = ''; justCalculated = false; }
-  else currentInput = (currentInput === '0' || currentInput === 'ERROR') ? n : currentInput + n;
-  updateDisplay(currentInput, expression);
-}
-
-function appendDot() {
-  if (justCalculated) { currentInput = '0.'; justCalculated = false; }
-  if (!currentInput.includes('.')) currentInput += '.';
-  updateDisplay(currentInput);
-}
-
-function appendOp(
+</body>
+              </html>
+              
